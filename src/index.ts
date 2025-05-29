@@ -2,7 +2,6 @@ import type { CollectionSlug, Config } from 'payload'
 
 import { createDepartmentReviewCollection } from './collections/department-reviews.js'
 import { Departments } from './collections/index.js'
-import DepartmentReview from './components/DepartmentReview/index.js'
 import { slugify } from './utils/slugify.js'
 
 export type CollectionTrackerConfig = {
@@ -58,11 +57,35 @@ export const publishableTracker =
 
         config.collections.map((collection) => {
           if (trackedCollections.has(collection.slug)) {
+            collection.hooks = {
+              ...collection.hooks,
+              beforeChange: [
+                async (args) => {
+                  // Show item id and find it in payload
+                  const item = await args.req.payload.find({
+                    collection: collection.slug,
+                    where: {
+                      id: {
+                        equals: args.data.id,
+                      },
+                    },
+                  })
+                  console.log(item)
+                },
+              ],
+            }
+
             collection.admin = {
               ...collection.admin,
               components: {
                 ...collection.admin?.components,
-                afterList: [],
+                edit: {
+                  beforeDocumentControls: [
+                    {
+                      path: '../src/components/DepartmentReview',
+                    },
+                  ],
+                },
               },
             }
           }
