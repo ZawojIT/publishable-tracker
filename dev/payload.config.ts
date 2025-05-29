@@ -59,9 +59,12 @@ const buildConfigWithMemoryDB = async () => {
     },
     plugins: [
       publishableTracker({
-        collections: {
-          posts: true,
-        },
+        collection_trackers: [
+          {
+            collection_tracker: 'posts',
+            departments_required_review: ['Business'],
+          },
+        ],
       }),
     ],
     secret: process.env.PAYLOAD_SECRET || 'test-secret_key',
