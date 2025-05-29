@@ -2,6 +2,7 @@ import type { CollectionSlug, Config } from 'payload'
 
 import { createDepartmentReviewCollection } from './collections/department-reviews.js'
 import { Departments } from './collections/index.js'
+import DepartmentReview from './components/DepartmentReview/index.js'
 import { slugify } from './utils/slugify.js'
 
 export type CollectionTrackerConfig = {
@@ -54,6 +55,18 @@ export const publishableTracker =
         config.collections.push(
           createDepartmentReviewCollection(deptSlug, Array.from(trackedCollections)),
         )
+
+        config.collections.map((collection) => {
+          if (trackedCollections.has(collection.slug)) {
+            collection.admin = {
+              ...collection.admin,
+              components: {
+                ...collection.admin?.components,
+                afterList: [],
+              },
+            }
+          }
+        })
       }
     })
 
@@ -63,10 +76,6 @@ export const publishableTracker =
 
     if (!config.admin.components) {
       config.admin.components = {}
-    }
-
-    if (!config.admin.components.beforeDashboard) {
-      config.admin.components.beforeDashboard = []
     }
 
     const incomingOnInit = config.onInit
